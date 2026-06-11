@@ -17,7 +17,7 @@
 #if !defined(SQLITE_CORE) || defined(SQLITE_ENABLE_RBU)
 
 #include "sqlite3rbu.h"
-#include "tclsqlite.h"
+#include "tcl/tclsqlite.h"
 #include <assert.h>
 #include <string.h>
 
@@ -425,7 +425,7 @@ int SqliteRbu_Init(Tcl_Interp *interp){
 }
 
 #else
-#include "tclsqlite.h"
+#include "tcl/tclsqlite.h"
 int SqliteRbu_Init(Tcl_Interp *interp){ return TCL_OK; }
 #endif /* !defined(SQLITE_CORE) || defined(SQLITE_ENABLE_RBU) */
 #endif /* defined(SQLITE_TEST) */

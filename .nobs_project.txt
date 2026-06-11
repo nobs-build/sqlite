@@ -1,0 +1,67 @@
+name sqlite
+
+tools {
+  sqlite_tcl {
+    tool_type = "command"
+    !TCLSH
+    !TCL_SCRIPT
+    TCL_INPUT_FILES ?= "-"
+    TCL_STDOUT ?= "-"
+    TCL_ARGS ?= "-"
+    TCL_MKSOURCEID ?= "-"
+
+    cmdline = "${TCLSH} ${PROJECT_ROOT}/tool/run_tcl.tcl ${TCL_SCRIPT} ${TCL_STDOUT} ${TCL_INPUT_FILES} ${TCL_ARGS} ${TCL_MKSOURCEID}"
+  }
+}
+
+units {
+  sqlite {
+    "nobs.txt"
+  }
+
+  sqlite_tools {
+    "sqlite-tools.nobs.txt"
+  }
+}
+
+profiles {
+  windows_debug {
+    MSVC
+    ARCH="x64"
+    TARGET_PLATFORM="windows"
+    SQLITE_OBJ_C_FLAGS = ["/c", "/nologo", "/fp:precise"]
+    SQLITE_TOOL_C_FLAGS = ["/nologo", "/fp:precise"]
+    SQLITE_TARGET_C_DEFINES = ["SQLITE_OS_WIN=1"]
+    C_FLAGS += ["/Od", "/Zi", "/RTC1"]
+  }
+
+  windows_release {
+    MSVC
+    ARCH="x64"
+    TARGET_PLATFORM="windows"
+    SQLITE_OBJ_C_FLAGS = ["/c", "/nologo", "/fp:precise"]
+    SQLITE_TOOL_C_FLAGS = ["/nologo", "/fp:precise"]
+    SQLITE_TARGET_C_DEFINES = ["SQLITE_OS_WIN=1"]
+    C_FLAGS += ["/O2"]
+  }
+
+  unix_debug {
+    GNU
+    ARCH="x86_64"
+    TARGET_PLATFORM="unix"
+    SQLITE_OBJ_C_FLAGS = ["-c"]
+    SQLITE_TOOL_C_FLAGS = []
+    SQLITE_TARGET_C_DEFINES = []
+    C_FLAGS += ["-O0", "-g"]
+  }
+
+  unix_release {
+    GNU
+    ARCH="x86_64"
+    TARGET_PLATFORM="unix"
+    SQLITE_OBJ_C_FLAGS = ["-c"]
+    SQLITE_TOOL_C_FLAGS = []
+    SQLITE_TARGET_C_DEFINES = []
+    C_FLAGS += ["-O2"]
+  }
+}

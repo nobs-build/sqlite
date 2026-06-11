@@ -35,7 +35,7 @@ ifcapable !vtab||!schema_pragmas {
 # vtab1-6.*: Test UPDATE/INSERT/DELETE on vtables.
 # vtab1-7.*: Test sqlite3_last_insert_rowid().
 #
-# This file uses the "echo" module (see src/test8.c). Refer to comments
+# This file uses the "echo" module (see src/test/test8.c). Refer to comments
 # in that file for the special behaviour of the Tcl $echo_module variable.
 #
 # TODO: 

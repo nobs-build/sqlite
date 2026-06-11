@@ -14,7 +14,7 @@
 
 #include "sqlite3recover.h"
 #include "sqliteInt.h"
-#include "tclsqlite.h"
+#include "tcl/tclsqlite.h"
 #include <assert.h>
 
 #ifndef SQLITE_OMIT_VIRTUALTABLE

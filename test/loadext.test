@@ -82,7 +82,7 @@ if {$::tcl_platform(os) eq "Windows NT"} {
 #
 if {![file exists $testextension]} {
   set srcdir [file dir $testdir]/src
-  set testextsrc $srcdir/test_loadext.c
+  set testextsrc $srcdir/test/test_loadext.c
 
   set cmdline [concat exec gcc $gcc_shared]
   lappend cmdline -Wall -I$srcdir -I. -I.. -g $testextsrc -o $testextension

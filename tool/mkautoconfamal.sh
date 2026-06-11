@@ -78,7 +78,7 @@ cat <<EOF > tea/generic/tclsqlite3.c
 # include "sqlite3.c"
 #endif
 EOF
-cat  $TOP/src/tclsqlite.c           >> tea/generic/tclsqlite3.c
+cat  $TOP/src/tcl/tclsqlite.c       >> tea/generic/tclsqlite3.c
 
 # Clean up some local remnants from the tarball.
 rm -f tea/.env-* # autosetup environment overrides

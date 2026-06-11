@@ -3,7 +3,7 @@
 ## 1.0 Background
 
 The SQLite TCL extension logic (in the 
-"[tclsqlite.c](/file/src/tclsqlite.c)" source
+"[tclsqlite.c](/file/src/tcl/tclsqlite.c)" source
 file) is statically linked into "textfixture" executable
 which is the program used to do most of the testing
 associated with "make test", "make devtest", and/or

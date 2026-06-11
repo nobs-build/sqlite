@@ -720,48 +720,48 @@ SRC += \
 # Source code to the test files.
 #
 TESTSRC = \
-  $(TOP)/src/test1.c \
-  $(TOP)/src/test2.c \
-  $(TOP)/src/test3.c \
-  $(TOP)/src/test4.c \
-  $(TOP)/src/test5.c \
-  $(TOP)/src/test6.c \
-  $(TOP)/src/test8.c \
-  $(TOP)/src/test9.c \
-  $(TOP)/src/test_autoext.c \
-  $(TOP)/src/test_backup.c \
-  $(TOP)/src/test_bestindex.c \
-  $(TOP)/src/test_blob.c \
-  $(TOP)/src/test_btree.c \
-  $(TOP)/src/test_config.c \
-  $(TOP)/src/test_delete.c \
-  $(TOP)/src/test_demovfs.c \
-  $(TOP)/src/test_devsym.c \
-  $(TOP)/src/test_fs.c \
-  $(TOP)/src/test_func.c \
-  $(TOP)/src/test_hexio.c \
-  $(TOP)/src/test_init.c \
-  $(TOP)/src/test_intarray.c \
-  $(TOP)/src/test_journal.c \
-  $(TOP)/src/test_malloc.c \
-  $(TOP)/src/test_md5.c \
-  $(TOP)/src/test_multiplex.c \
-  $(TOP)/src/test_mutex.c \
-  $(TOP)/src/test_onefile.c \
-  $(TOP)/src/test_osinst.c \
-  $(TOP)/src/test_pcache.c \
-  $(TOP)/src/test_quota.c \
-  $(TOP)/src/test_rtree.c \
-  $(TOP)/src/test_schema.c \
-  $(TOP)/src/test_superlock.c \
-  $(TOP)/src/test_syscall.c \
-  $(TOP)/src/test_tclsh.c \
-  $(TOP)/src/test_tclvar.c \
-  $(TOP)/src/test_thread.c \
-  $(TOP)/src/test_vdbecov.c \
-  $(TOP)/src/test_vfs.c \
-  $(TOP)/src/test_window.c \
-  $(TOP)/src/test_wsd.c       \
+  $(TOP)/src/test/test1.c \
+  $(TOP)/src/test/test2.c \
+  $(TOP)/src/test/test3.c \
+  $(TOP)/src/test/test4.c \
+  $(TOP)/src/test/test5.c \
+  $(TOP)/src/test/test6.c \
+  $(TOP)/src/test/test8.c \
+  $(TOP)/src/test/test9.c \
+  $(TOP)/src/test/test_autoext.c \
+  $(TOP)/src/test/test_backup.c \
+  $(TOP)/src/test/test_bestindex.c \
+  $(TOP)/src/test/test_blob.c \
+  $(TOP)/src/test/test_btree.c \
+  $(TOP)/src/test/test_config.c \
+  $(TOP)/src/test/test_delete.c \
+  $(TOP)/src/test/test_demovfs.c \
+  $(TOP)/src/test/test_devsym.c \
+  $(TOP)/src/test/test_fs.c \
+  $(TOP)/src/test/test_func.c \
+  $(TOP)/src/test/test_hexio.c \
+  $(TOP)/src/test/test_init.c \
+  $(TOP)/src/test/test_intarray.c \
+  $(TOP)/src/test/test_journal.c \
+  $(TOP)/src/test/test_malloc.c \
+  $(TOP)/src/test/test_md5.c \
+  $(TOP)/src/test/test_multiplex.c \
+  $(TOP)/src/test/test_mutex.c \
+  $(TOP)/src/test/test_onefile.c \
+  $(TOP)/src/test/test_osinst.c \
+  $(TOP)/src/test/test_pcache.c \
+  $(TOP)/src/test/test_quota.c \
+  $(TOP)/src/test/test_rtree.c \
+  $(TOP)/src/test/test_schema.c \
+  $(TOP)/src/test/test_superlock.c \
+  $(TOP)/src/test/test_syscall.c \
+  $(TOP)/src/test/test_tclsh.c \
+  $(TOP)/src/test/test_tclvar.c \
+  $(TOP)/src/test/test_thread.c \
+  $(TOP)/src/test/test_vdbecov.c \
+  $(TOP)/src/test/test_vfs.c \
+  $(TOP)/src/test/test_window.c \
+  $(TOP)/src/test/test_wsd.c       \
   $(TOP)/ext/fts3/fts3_term.c \
   $(TOP)/ext/fts3/fts3_test.c  \
   $(TOP)/ext/session/test_session.c \
@@ -1665,7 +1665,7 @@ install: install-tcl
 TCLSQLITEEX = \
   $(TOP)/ext/qrf/qrf.h \
   $(TOP)/ext/qrf/qrf.c \
-  $(TOP)/src/tclsqlite.c
+  $(TOP)/src/tcl/tclsqlite.c
 
 tclsqlite-ex.c:	$(TCLSQLITEEX) $(TOP)/tool/mkcombo.tcl $(B.tclsh)
 	$(B.tclsh) $(TOP)/tool/mkcombo.tcl $(TCLSQLITEEX) -o $@
@@ -2130,7 +2130,7 @@ THREADTEST3_SRC = $(TOP)/test/threadtest3.c    \
                   $(TOP)/test/tt3_lookaside1.c
 
 threadtest3$(T.exe): sqlite3.o $(THREADTEST3_SRC)
-	$(T.link) $(TOP)/test/threadtest3.c $(TOP)/src/test_multiplex.c sqlite3.o \
+	$(T.link) $(TOP)/test/threadtest3.c $(TOP)/src/test/test_multiplex.c sqlite3.o \
 		-o $@ $(LDFLAGS.libsqlite3)
 xbin: threadtest3$(T.exe)
 

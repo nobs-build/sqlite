@@ -91,103 +91,49 @@ like.  Some examples:
 
 Or type "fossil ui" to get a web-based user interface.
 
-## Compiling for Unix-like systems
+## Compiling With Nobs
 
-First create a directory in which to place
-the build products.  It is recommended, but not required, that the
-build directory be separate from the source directory.  Cd into the
-build directory and then from the build directory run the configure
-script found at the root of the source tree.  Then run "make".
-See the [compile-for-unix.md](doc/compile-for-unix.md) document for
-more detail.
+This tree contains a [Nobs](https://nobs.build/) build for the SQLite
+command-line shell, the static library, and a growing set of auxiliary tools.
+It is not yet a complete replacement for every upstream makefile target.
 
-For example:
+From the source tree root, the default `sqlite` unit can build the CLI shell
+and static library:
 
-        apt install gcc make tcl-dev  ;#  Install the necessary build tools
-        tar xzf sqlite.tar.gz         ;#  Unpack the source tree into "sqlite"
-        mkdir bld                     ;#  Build happens in a sibling directory
-        cd bld                        ;#  Change to the build directory
-        ../sqlite/configure           ;#  Run the configure script
-        make sqlite3                  ;#  The "sqlite3" command-line tool
-        make sqlite3.c                ;#  The "amalgamation" source file
-        make sqldiff                  ;#  The "sqldiff" command-line tool
-        #### Targets below require tcl-dev ####
-        make tclextension-install     ;#  Install the SQLite TCL extension
-        make devtest                  ;#  Run development tests
-        make releasetest              ;#  Run full release tests
-        make sqlite3_analyzer         ;#  Builds the "sqlite3_analyzer" tool
+        nobs build unix_release        ;# Unix-like systems with a GNU compiler
+        nobs lib unix_release          ;# Static library
+        nobs build windows_release     ;# Windows with MSVC
+        nobs lib windows_release       ;# Static library
 
-See the makefile for additional targets.  For debugging builds, the
-core developers typically run "configure" with options like this:
+Diagnostic and developer tools are grouped in the `sqlite_tools` unit:
 
-        ../sqlite/configure --all --debug CFLAGS='-O0 -g'
+        nobs sqlite_tools::all unix_release
+        nobs sqlite_tools::all windows_release
 
-For release builds, the core developers usually do:
+The current `sqlite_tools::all` target builds these tools:
 
-        ../sqlite/configure --all
+        dbtotxt showshm showtmlog sqldiff dbhash showdb showstat4 showjournal
+        showwal dbdump index_usage sqlite3_expert rollback-test atrc wordcount
+        speedtest1 fp-speed-1 fp-speed-2 kvtest
 
-Core deliverables (sqlite3.c, sqlite3) can be built without a TCL, but
-many makefile targets require a "tclsh" TCL interpreter version 8.6
-or later.  The "tclextension-install" target and the test targets that follow
-all require TCL development libraries too.  ("apt install tcl-dev").  It is
-helpful, but is not required, to install the SQLite TCL extension (the
-"tclextension-install" target) prior to running tests.  The "releasetest"
-target has additional requirements, such as "valgrind".
+The Nobs build currently does not cover all makefile targets.  In particular,
+the following areas are still missing or intentionally left out:
 
-On "make" command-lines, one can add "OPTIONS=..." to specify additional
-compile-time options over and above those set by ./configure.  For example,
-to compile with the SQLITE_OMIT_DEPRECATED compile-time option, one could say:
+  *  The `sqlite3.c` amalgamation target and release packaging targets.
 
-        ./configure --all
-        make OPTIONS=-DSQLITE_OMIT_DEPRECATED sqlite3
+  *  TCL-dependent targets such as `testfixture`, `devtest`, `releasetest`,
+     `tclextension-*`, `sqltclsh`, and `sqlite3_analyzer`.
 
-The configure script uses [autosetup](https://msteveb.github.io/autosetup/).
-If the configure script does not work out for you, there is a generic
-makefile named "Makefile.linux-gcc" in the top directory of the source tree
-that you can copy and edit to suit your needs.  Comments on the generic
-makefile show what changes are needed.
+  *  The `loadfts` tool.
 
-## Compiling for Windows Using MSVC
+  *  Additional standalone tools such as `LogEst`, `startup`, `sqlite3_rsync`,
+     `srcck1`, `src-verify`, and `fts3view`.
 
-On Windows, everything can be compiled with MSVC.
-You will also need a working installation of TCL if you want to run tests,
-though TCL is not required if you just want to build SQLite itself.
-See the [compile-for-windows.md](doc/compile-for-windows.md) document for
-additional information about how to install MSVC and TCL and configure your
-build environment.
+  *  Session and RBU tools such as `changeset`, `changesetfuzz`, and `rbu`.
 
-If you want to run tests, you need to let SQLite know the location of your
-TCL library, using a command like this:
-
-        set TCLDIR=c:\Tcl
-
-SQLite itself does not contain any TCL code, but it does use TCL to run
-tests. You may need to install TCL development libraries in order to
-successfully complete some makefile targets. It is helpful, but is not
-required, to install the SQLite TCL extension (the "tclextension-install"
-target) prior to running tests.
-
-The source tree contains a "make.bat" file that allows the same "make"
-commands of Unix to work on Windows.  In the following, you can substitute
-"nmake /f Makefile.msc" in place of "make", if you prefer to avoid this BAT
-file:
-
-        make sqlite3.exe
-        make sqlite3.c
-        make sqldiff.exe
-        #### Targets below require TCL development libraries ####
-        make tclextension-install
-        make devtest
-        make releasetest
-        make sqlite3_analyzer.exe
- 
-There are many other makefile targets.  See comments in Makefile.msc for
-details.
-
-As with the unix Makefile, the OPTIONS=... argument can be passed on the nmake
-command-line to enable new compile-time options.  For example:
-
-        make OPTIONS=-DSQLITE_OMIT_DEPRECATED sqlite3.exe
+  *  Fuzzing and stress-test programs such as `fuzzershell`, `fuzzcheck`,
+     `fuzzcheck-asan`, `fuzzcheck-ubsan`, `ossshell`, `sessionfuzz`, `dbfuzz`,
+     `dbfuzz2`, `mptester`, `threadtest3`, and `threadtest5`.
 
 ## Source Tree Map
 

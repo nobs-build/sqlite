@@ -5,7 +5,7 @@
 #include "sqlite3session.h"
 #include <assert.h>
 #include <string.h>
-#include "tclsqlite.h"
+#include "tcl/tclsqlite.h"
 
 #include <stdlib.h>
 

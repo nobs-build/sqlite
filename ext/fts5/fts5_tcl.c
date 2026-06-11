@@ -14,7 +14,7 @@
 
 
 #ifdef SQLITE_TEST
-#include "tclsqlite.h"
+#include "tcl/tclsqlite.h"
 
 #ifdef SQLITE_ENABLE_FTS5
 

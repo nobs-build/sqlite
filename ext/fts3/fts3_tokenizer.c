@@ -226,7 +226,7 @@ int sqlite3Fts3InitTokenizer(
 
 #ifdef SQLITE_TEST
 
-#include "tclsqlite.h"
+#include "tcl/tclsqlite.h"
 #include <string.h>
 
 /*

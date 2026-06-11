@@ -1,0 +1,316 @@
+unit sqlite
+
+// Default target: sqlite3 CLI shell
+// Links all object targets directly (lib target is a separate standalone artifact)
+build: +core_objs +fts3_objs +rtree_objs +misc_objs +shell_objs
+{
+    LINK
+    OBJS
+    OUTPUT_NAME = "sqlite3.exe"
+
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "sqlite3"
+        LIB += ["-lpthread", "-ldl", "-lm"]
+    }
+}
+
+// Static library
+lib: +core_objs +fts3_objs +rtree_objs +misc_objs
+{
+    OBJS
+    STATIC
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "sqlite3.lib"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "libsqlite3.a"
+    }
+
+    ^INCLUDE = [P"(src)", P"(generated)"]
+}
+
+// Shell source compilation
+shell_objs: gen_sqlite3h gen_shell_c
+{
+    C_FILES = P"(generated/shell.c)"
+
+    C_DEFINES = [
+        "SQLITE_ENABLE_FTS3=1",
+        "SQLITE_ENABLE_RTREE=1",
+        "SQLITE_ENABLE_GEOPOLY=1",
+        "SQLITE_ENABLE_COLUMN_METADATA=1",
+        "SQLITE_ENABLE_MATH_FUNCTIONS",
+        "SQLITE_ENABLE_PERCENTILE",
+        "SQLITE_ENABLE_CARRAY=1",
+        "SQLITE_ENABLE_DBPAGE_VTAB=1",
+        "SQLITE_ENABLE_DBSTAT_VTAB=1",
+        "SQLITE_ENABLE_BYTECODE_VTAB=1",
+        "SQLITE_ENABLE_STMTVTAB=1",
+        "SQLITE_ENABLE_EXPLAIN_COMMENTS"
+    ]
+
+    INCLUDE = [P"(src)", P"(generated)"]
+
+    C_FLAGS = SQLITE_OBJ_C_FLAGS
+    C_DEFINES += SQLITE_TARGET_C_DEFINES
+}
+
+// Build the mksourceid helper tool (used by gen_sqlite3h)
+mksourceid_build:
+{
+    C_FILES = P"(tool/mksourceid.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "mksourceid.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "mksourceid"
+    }
+}
+
+// Build the Jim Tcl interpreter used by SQLite's Tcl code-generation scripts.
+jimsh_build:
+{
+    C_FILES = P"(autosetup/jimsh0.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "sqlite-jimsh.exe"
+        C_DEFINES = ["HAVE__FULLPATH"]
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "sqlite-jimsh"
+        C_DEFINES = ["HAVE_REALPATH"]
+    }
+}
+
+// Generate generated/sqlite3.h
+// Depends on mksourceid_build so the source-ID binary is ready first.
+gen_sqlite3h: mksourceid_build jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/mksqlite3h.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = "-"
+    TCL_ARGS = "${PROJECT_ROOT},-o,${PROJECT_ROOT}/generated/sqlite3.h"
+    TCL_MKSOURCEID = "${mksourceid_build.BINARY}"
+}
+
+// Build lemon parser generator
+lemon_build:
+{
+    C_FILES = P"(tool/lemon.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "lemon.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "lemon"
+    }
+}
+
+// Generate parse.c and parse.h via Lemon
+gen_parse: lemon_build jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/gen_parse.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = "-"
+    TCL_ARGS = "${lemon_build.BINARY},${PROJECT_ROOT}"
+    TCL_MKSOURCEID = "-"
+}
+
+// Generate opcodes.h from parse.h and vdbe.c
+gen_opcodes_h: gen_parse jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/mkopcodeh.tcl)"
+    TCL_INPUT_FILES = "generated/parse.h,src/vdbe.c"
+    TCL_STDOUT = P"(generated/opcodes.h)"
+    TCL_ARGS = "-"
+    TCL_MKSOURCEID = "-"
+}
+
+// Generate opcodes.c from opcodes.h
+gen_opcodes_c: gen_opcodes_h jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/mkopcodec.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = P"(generated/opcodes.c)"
+    TCL_ARGS = "generated/opcodes.h"
+    TCL_MKSOURCEID = "-"
+}
+
+// Build mkkeywordhash helper tool
+mkkeywordhash_build:
+{
+    C_FILES = P"(tool/mkkeywordhash.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "mkkeywordhash.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "mkkeywordhash"
+    }
+}
+
+// Generate keywordhash.h
+gen_keywordhash: mkkeywordhash_build jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/gen_keywordhash.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = "-"
+    TCL_ARGS = "${mkkeywordhash_build.BINARY},${PROJECT_ROOT}"
+    TCL_MKSOURCEID = "-"
+}
+
+// Generate pragma.h
+gen_pragma_h: jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/mkpragmatab.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = "-"
+    TCL_ARGS = "generated/pragma.h"
+    TCL_MKSOURCEID = "-"
+}
+
+// Generate ctime.c
+gen_ctime_c: jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/mkctimec.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = "-"
+    TCL_ARGS = "generated/ctime.c"
+    TCL_MKSOURCEID = "-"
+}
+
+// Generate shell.c from shell.c.in
+gen_shell_c: jimsh_build
+{
+    cwd = P"(.)"
+    TCLSH = "${jimsh_build.BINARY}"
+    TCL_SCRIPT = P"(tool/mkshellc.tcl)"
+    TCL_INPUT_FILES = "-"
+    TCL_STDOUT = "-"
+    TCL_ARGS = "generated/shell.c"
+    TCL_MKSOURCEID = "-"
+}
+
+// Core SQLite object compilation
+// Generated files (ctime.c, opcodes.c, parse.c) must exist in generated/
+core_objs: gen_sqlite3h gen_parse gen_opcodes_h gen_opcodes_c gen_keywordhash gen_pragma_h gen_ctime_c
+{
+    C_FILES = [
+        P"(src/*.c)",
+        P"(src/plat/${TARGET_PLATFORM}/*.c)",
+        P"(generated/ctime.c)",
+        P"(generated/opcodes.c)",
+        P"(generated/parse.c)"
+    ]
+
+    C_DEFINES = [
+        "SQLITE_ENABLE_FTS3=1",
+        "SQLITE_ENABLE_RTREE=1",
+        "SQLITE_ENABLE_GEOPOLY=1",
+        "SQLITE_ENABLE_COLUMN_METADATA=1",
+        "SQLITE_ENABLE_MATH_FUNCTIONS",
+        "SQLITE_ENABLE_PERCENTILE",
+        "SQLITE_ENABLE_CARRAY=1",
+        "SQLITE_ENABLE_DBPAGE_VTAB=1",
+        "SQLITE_ENABLE_DBSTAT_VTAB=1",
+        "SQLITE_ENABLE_BYTECODE_VTAB=1",
+        "SQLITE_ENABLE_STMTVTAB=1"
+    ]
+
+    INCLUDE = [P"(src)", P"(src/plat/${TARGET_PLATFORM})", P"(generated)", P"(ext/fts3)", P"(ext/rtree)"]
+
+    C_FLAGS = SQLITE_OBJ_C_FLAGS
+    C_DEFINES += SQLITE_TARGET_C_DEFINES
+}
+
+// FTS3 full-text search extension
+// fts3_icu.c is excluded (requires the ICU library)
+fts3_objs: gen_sqlite3h
+{
+    C_FILES = [
+        P"(ext/fts3/fts3.c)",
+        P"(ext/fts3/fts3_aux.c)",
+        P"(ext/fts3/fts3_expr.c)",
+        P"(ext/fts3/fts3_hash.c)",
+        P"(ext/fts3/fts3_porter.c)",
+        P"(ext/fts3/fts3_snippet.c)",
+        P"(ext/fts3/fts3_tokenizer.c)",
+        P"(ext/fts3/fts3_tokenizer1.c)",
+        P"(ext/fts3/fts3_tokenize_vtab.c)",
+        P"(ext/fts3/fts3_unicode.c)",
+        P"(ext/fts3/fts3_unicode2.c)",
+        P"(ext/fts3/fts3_write.c)"
+    ]
+
+    C_DEFINES = [
+        "SQLITE_ENABLE_FTS3=1",
+        "SQLITE_ENABLE_FTS3_PARENTHESIS=1",
+        "SQLITE_CORE"
+    ]
+
+    INCLUDE = [P"(src)", P"(generated)"]
+
+    C_FLAGS = SQLITE_OBJ_C_FLAGS
+    C_DEFINES += SQLITE_TARGET_C_DEFINES
+}
+
+// R-Tree spatial indexing extension
+// geopoly.c is included via #include inside rtree.c, not compiled separately
+rtree_objs: gen_sqlite3h
+{
+    C_FILES = P"(ext/rtree/rtree.c)"
+
+    C_DEFINES = [
+        "SQLITE_ENABLE_RTREE=1",
+        "SQLITE_ENABLE_GEOPOLY=1",
+        "SQLITE_CORE"
+    ]
+
+    INCLUDE = [P"(src)", P"(generated)"]
+
+    C_FLAGS = SQLITE_OBJ_C_FLAGS
+    C_DEFINES += SQLITE_TARGET_C_DEFINES
+}
+
+// Miscellaneous extensions
+misc_objs: gen_sqlite3h
+{
+    C_FILES = P"(ext/misc/stmt.c)"
+
+    C_DEFINES = [
+        "SQLITE_ENABLE_STMTVTAB=1",
+        "SQLITE_CORE"
+    ]
+
+    INCLUDE = [P"(src)", P"(generated)"]
+
+    C_FLAGS = SQLITE_OBJ_C_FLAGS
+    C_DEFINES += SQLITE_TARGET_C_DEFINES
+}

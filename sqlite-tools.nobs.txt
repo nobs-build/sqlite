@@ -1,0 +1,365 @@
+unit sqlite_tools
+
+// Developer and diagnostic SQLite tools.
+// The default target intentionally builds only tools that can link against the
+// current non-amalgamation sqlite unit without extra Tcl, zlib, Session, RBU,
+// or fuzz-test setup.
+all: dbtotxt showshm showtmlog sqldiff dbhash showdb showstat4 showjournal showwal dbdump index_usage sqlite3_expert rollback_test atrc wordcount speedtest1 fp_speed_1 fp_speed_2 kvtest
+{
+    NO_TOOL
+}
+
+tool_settings:
+{
+    NO_TOOL
+
+    ^INCLUDE = [
+        P"(src)",
+        P"(generated)",
+        P"(ext/misc)",
+        P"(ext/expert)",
+        P"(ext/fts3)",
+        P"(ext/rtree)"
+    ]
+
+    ^C_DEFINES = [
+        "SQLITE_ENABLE_FTS3=1",
+        "SQLITE_ENABLE_RTREE=1",
+        "SQLITE_ENABLE_GEOPOLY=1",
+        "SQLITE_ENABLE_COLUMN_METADATA=1",
+        "SQLITE_ENABLE_MATH_FUNCTIONS",
+        "SQLITE_ENABLE_PERCENTILE",
+        "SQLITE_ENABLE_CARRAY=1",
+        "SQLITE_ENABLE_DBPAGE_VTAB=1",
+        "SQLITE_ENABLE_DBSTAT_VTAB=1",
+        "SQLITE_ENABLE_BYTECODE_VTAB=1",
+        "SQLITE_ENABLE_STMTVTAB=1",
+        "SQLITE_ENABLE_EXPLAIN_COMMENTS"
+    ]
+
+    ^C_DEFINES += SQLITE_TARGET_C_DEFINES
+    ^C_FLAGS = SQLITE_TOOL_C_FLAGS
+
+    if os_family = "unix"
+    {
+        ^LIB = ["-lpthread", "-ldl", "-lm"]
+    }
+}
+
+sqlite_lib: +sqlite::lib
+{
+    NO_TOOL
+    ^LIB
+}
+
+dbtotxt: +tool_settings
+{
+    C_FILES = P"(tool/dbtotxt.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "dbtotxt.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "dbtotxt"
+    }
+}
+
+showshm: +tool_settings
+{
+    C_FILES = P"(tool/showshm.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "showshm.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "showshm"
+    }
+}
+
+showtmlog: +tool_settings
+{
+    C_FILES = P"(tool/showtmlog.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "showtmlog.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "showtmlog"
+    }
+}
+
+sqldiff: +tool_settings +sqlite_lib
+{
+    C_FILES = [
+        P"(tool/sqldiff.c)",
+        P"(ext/misc/sqlite3_stdio.c)"
+    ]
+
+    if os_family = "windows"
+    {
+        C_FILES += P"(tool/winmain.c)"
+        OUTPUT_NAME = "sqldiff.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "sqldiff"
+    }
+}
+
+dbhash: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/dbhash.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "dbhash.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "dbhash"
+    }
+}
+
+showdb: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/showdb.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "showdb.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "showdb"
+    }
+}
+
+showstat4: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/showstat4.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "showstat4.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "showstat4"
+    }
+}
+
+showjournal: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/showjournal.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "showjournal.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "showjournal"
+    }
+}
+
+showwal: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/showwal.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "showwal.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "showwal"
+    }
+}
+
+dbdump: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(ext/misc/dbdump.c)"
+    C_DEFINES += ["DBDUMP_STANDALONE"]
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "dbdump.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "dbdump"
+    }
+}
+
+index_usage: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/index_usage.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "index_usage.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "index_usage"
+    }
+}
+
+sqlite3_expert: +tool_settings +sqlite_lib
+{
+    C_FILES = [
+        P"(ext/expert/sqlite3expert.c)",
+        P"(ext/expert/expert.c)"
+    ]
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "sqlite3_expert.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "sqlite3_expert"
+    }
+}
+
+rollback_test: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(tool/rollback-test.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "rollback-test.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "rollback-test"
+    }
+}
+
+atrc: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(test/atrc.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "atrc.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "atrc"
+    }
+}
+
+wordcount: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(test/wordcount.c)"
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "wordcount.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "wordcount"
+    }
+}
+
+speedtest1: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(test/speedtest1.c)"
+    C_DEFINES += ["SQLITE_OMIT_LOAD_EXTENSION"]
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "speedtest1.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "speedtest1"
+    }
+}
+
+fp_speed_1: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(test/fp-speed-1.c)"
+    C_DEFINES += ["SQLITE_OMIT_LOAD_EXTENSION"]
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "fp-speed-1.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "fp-speed-1"
+    }
+}
+
+fp_speed_2: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(test/fp-speed-2.c)"
+    C_DEFINES += ["SQLITE_OMIT_LOAD_EXTENSION"]
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "fp-speed-2.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "fp-speed-2"
+    }
+}
+
+kvtest: +tool_settings +sqlite_lib
+{
+    C_FILES = P"(test/kvtest.c)"
+    C_DEFINES += [
+        "SQLITE_DIRECT_OVERFLOW_READ",
+        "SQLITE_OMIT_LOAD_EXTENSION"
+    ]
+
+    if os_family = "windows"
+    {
+        OUTPUT_NAME = "kvtest.exe"
+    }
+    if os_family = "unix"
+    {
+        OUTPUT_NAME = "kvtest"
+    }
+}
+
+// Targets below are intentionally not part of "all". They need additional
+// SQLite build variants or external Tcl/zlib/fuzz setup before they can be
+// reliable drop-in replacements for the makefile targets.
+
+session_tools:
+{
+    NO_TOOL
+    // changeset, changesetfuzz need the core SQLite objects rebuilt with
+    // SQLITE_ENABLE_SESSION and SQLITE_ENABLE_PREUPDATE_HOOK.
+}
+
+rbu_tools:
+{
+    NO_TOOL
+    // rbu needs the core SQLite objects rebuilt with SQLITE_ENABLE_RBU.
+}
+
+fuzz_tools:
+{
+    NO_TOOL
+    // fuzzershell, fuzzcheck, ossshell, sessionfuzz, dbfuzz, and dbfuzz2
+    // are best added after sqlite3.c amalgamation generation exists.
+}
+
+tcl_tools:
+{
+    NO_TOOL
+    // testfixture, sqltclsh, tclsqlite3, and sqlite3_analyzer's Tcl mode
+    // need Tcl include/library discovery equivalent to configure/Makefile.msc.
+}

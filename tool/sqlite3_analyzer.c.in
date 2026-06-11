@@ -20,7 +20,7 @@ INCLUDE sqlite3.c
 ELSE
 #include "sqlite3.h"
 ENDIF
-INCLUDE $ROOT/src/tclsqlite.c
+INCLUDE $ROOT/src/tcl/tclsqlite.c
 
 #if defined(_WIN32)
 INCLUDE $ROOT/ext/misc/sqlite3_stdio.h

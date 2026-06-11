@@ -1523,48 +1523,48 @@ SRC = $(SRC00) $(SRC01) $(SRC03) $(SRC04) $(SRC05) $(SRC07) $(SRC09) $(SRC10) $(
 # Source code to the test files.
 #
 TESTSRC = \
-  $(TOP)\src\test1.c \
-  $(TOP)\src\test2.c \
-  $(TOP)\src\test3.c \
-  $(TOP)\src\test4.c \
-  $(TOP)\src\test5.c \
-  $(TOP)\src\test6.c \
-  $(TOP)\src\test8.c \
-  $(TOP)\src\test9.c \
-  $(TOP)\src\test_autoext.c \
-  $(TOP)\src\test_backup.c \
-  $(TOP)\src\test_bestindex.c \
-  $(TOP)\src\test_blob.c \
-  $(TOP)\src\test_btree.c \
-  $(TOP)\src\test_config.c \
-  $(TOP)\src\test_delete.c \
-  $(TOP)\src\test_demovfs.c \
-  $(TOP)\src\test_devsym.c \
-  $(TOP)\src\test_fs.c \
-  $(TOP)\src\test_func.c \
-  $(TOP)\src\test_hexio.c \
-  $(TOP)\src\test_init.c \
-  $(TOP)\src\test_intarray.c \
-  $(TOP)\src\test_journal.c \
-  $(TOP)\src\test_malloc.c \
-  $(TOP)\src\test_md5.c \
-  $(TOP)\src\test_multiplex.c \
-  $(TOP)\src\test_mutex.c \
-  $(TOP)\src\test_onefile.c \
-  $(TOP)\src\test_osinst.c \
-  $(TOP)\src\test_pcache.c \
-  $(TOP)\src\test_quota.c \
-  $(TOP)\src\test_rtree.c \
-  $(TOP)\src\test_schema.c \
-  $(TOP)\src\test_superlock.c \
-  $(TOP)\src\test_syscall.c \
-  $(TOP)\src\test_tclsh.c \
-  $(TOP)\src\test_tclvar.c \
-  $(TOP)\src\test_thread.c \
-  $(TOP)\src\test_vdbecov.c \
-  $(TOP)\src\test_vfs.c \
-  $(TOP)\src\test_window.c \
-  $(TOP)\src\test_wsd.c \
+  $(TOP)\src\test\test1.c \
+  $(TOP)\src\test\test2.c \
+  $(TOP)\src\test\test3.c \
+  $(TOP)\src\test\test4.c \
+  $(TOP)\src\test\test5.c \
+  $(TOP)\src\test\test6.c \
+  $(TOP)\src\test\test8.c \
+  $(TOP)\src\test\test9.c \
+  $(TOP)\src\test\test_autoext.c \
+  $(TOP)\src\test\test_backup.c \
+  $(TOP)\src\test\test_bestindex.c \
+  $(TOP)\src\test\test_blob.c \
+  $(TOP)\src\test\test_btree.c \
+  $(TOP)\src\test\test_config.c \
+  $(TOP)\src\test\test_delete.c \
+  $(TOP)\src\test\test_demovfs.c \
+  $(TOP)\src\test\test_devsym.c \
+  $(TOP)\src\test\test_fs.c \
+  $(TOP)\src\test\test_func.c \
+  $(TOP)\src\test\test_hexio.c \
+  $(TOP)\src\test\test_init.c \
+  $(TOP)\src\test\test_intarray.c \
+  $(TOP)\src\test\test_journal.c \
+  $(TOP)\src\test\test_malloc.c \
+  $(TOP)\src\test\test_md5.c \
+  $(TOP)\src\test\test_multiplex.c \
+  $(TOP)\src\test\test_mutex.c \
+  $(TOP)\src\test\test_onefile.c \
+  $(TOP)\src\test\test_osinst.c \
+  $(TOP)\src\test\test_pcache.c \
+  $(TOP)\src\test\test_quota.c \
+  $(TOP)\src\test\test_rtree.c \
+  $(TOP)\src\test\test_schema.c \
+  $(TOP)\src\test\test_superlock.c \
+  $(TOP)\src\test\test_syscall.c \
+  $(TOP)\src\test\test_tclsh.c \
+  $(TOP)\src\test\test_tclvar.c \
+  $(TOP)\src\test\test_thread.c \
+  $(TOP)\src\test\test_vdbecov.c \
+  $(TOP)\src\test\test_vfs.c \
+  $(TOP)\src\test\test_window.c \
+  $(TOP)\src\test\test_wsd.c \
   $(TOP)\ext\fts3\fts3_term.c \
   $(TOP)\ext\fts3\fts3_test.c \
   $(TOP)\ext\rbu\test_rbu.c \
@@ -1970,7 +1970,7 @@ sqlite3-all.c:	sqlite3.c $(TOP)\tool\split-sqlite3c.tcl $(JIM_TCLSH)
 TCLSQLITEEX = \
   $(TOP)\ext\qrf\qrf.h \
   $(TOP)\ext\qrf\qrf.c \
-  $(TOP)\src\tclsqlite.c
+  $(TOP)\src\tcl\tclsqlite.c
 
 tclsqlite-ex.c:	$(TCLSQLITEEX) $(TOP)\tool\mkcombo.tcl $(JIM_TCLSH)
 	$(JIM_TCLSH) $(TOP)\tool\mkcombo.tcl $(TCLSQLITEEX) -o $@
@@ -2656,8 +2656,8 @@ dbdump.exe:	$(TOP)\ext\misc\dbdump.c $(SQLITE3C) $(SQLITE3H) $(LIBRESOBJS)
 	$(LTLINK) $(NO_WARN) -DDBDUMP_STANDALONE $(TOP)\ext\misc\dbdump.c $(SQLITE3C) \
 		/link $(LDFLAGS) $(LTLINKOPTS) $(LTLIBPATHS) $(LIBRESOBJS) $(LTLIBS)
 
-testloadext.lo:	$(TOP)\src\test_loadext.c $(SQLITE3H)
-	$(LTCOMPILE) $(NO_WARN) -c $(TOP)\src\test_loadext.c
+testloadext.lo:	$(TOP)\src\test\test_loadext.c $(SQLITE3H)
+	$(LTCOMPILE) $(NO_WARN) -c $(TOP)\src\test\test_loadext.c
 
 testloadext.dll:	testloadext.lo
 	$(LD) $(LDFLAGS) $(LTLINKOPTS) $(LTLIBPATHS) /DLL /OUT:$@ testloadext.lo
@@ -2751,8 +2751,8 @@ THREADTEST3_SRC = \
   $(TOP)\test\tt3_stress.c \
   $(TOP)\test\tt3_lookaside1.c
 
-threadtest3.exe: $(THREADTEST3_SRC) $(TOP)\src\test_multiplex.c $(SQLITE3C) $(SQLITE3H)
-	$(LTLINK) $(NO_WARN) $(TOP)\test\threadtest3.c $(TOP)\src\test_multiplex.c $(SQLITE3C) /link $(LDFLAGS) $(LTLINKOPTS)
+threadtest3.exe: $(THREADTEST3_SRC) $(TOP)\src\test\test_multiplex.c $(SQLITE3C) $(SQLITE3H)
+	$(LTLINK) $(NO_WARN) $(TOP)\test\threadtest3.c $(TOP)\src\test\test_multiplex.c $(SQLITE3C) /link $(LDFLAGS) $(LTLINKOPTS)
 
 # Display key variables that control which version of TCL is to be used.
 #
